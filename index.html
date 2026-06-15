@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Campus Jastip - President University Startup Edition</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #DC2626;
+            --primary-hover: #B91C1C;
+            --bg-global: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #111827;
+            --text-muted: #64748B;
+            --accent-dark: #0F172A;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --info: #0EA5E9;
+            --border-radius: 16px;
+            --border-radius-lg: 24px;
+            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-global);
+            color: var(--text-main);
+            overflow-x: hidden;
+            padding-bottom: 90px;
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .glass-effect {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* --- SPLASH SCREEN --- */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent-dark) 0%, #1e293b 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        .splash-logo {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            animation: zoomIn 1.2s ease-in-out infinite alternate;
+        }
+        .splash-logo span { color: var(--primary); }
+        .progress-container {
+            width: 220px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.1s linear;
+        }
+
+        /* --- WELCOME HERO SCREEN --- */
+        #welcome-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-global);
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+        .hero-card {
+            background: var(--card-bg);
+            padding: 40px 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            max-width: 450px;
+            width: 100%;
+        }
+        .hero-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 12px; }
+        .hero-title span { color: var(--primary); }
+        .hero-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
+        .highlight-grid {
+            text-align: left;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .hl-item { font-size: 0.85rem; font-weight: 500; color: var(--accent-dark); }
+        .hl-item i { color: var(--success); margin-right: 6px; }
+        
+        .btn-premium {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-premium:active { transform: scale(0.98); }
+
+        /* --- FORMS & INPUT CONTROLS --- */
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--accent-dark);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: var(--border-radius);
+            outline: none;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: white;
+        }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.05); }
+
+        /* --- HEADER MANAGEMENT --- */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .logo-text { font-weight: 700; font-size: 1.25rem; cursor: pointer; }
+        .logo-text span { color: var(--primary); }
+        .header-actions { display: flex; align-items: center; }
+        .header-actions i {
+            font-size: 1.2rem;
+            margin-left: 16px;
+            cursor: pointer;
+            position: relative;
+        }
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        .container {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        /* Dynamic Real-Time Active Banner Tracker */
+        .active-tracker-banner {
+            background: white;
+            border: 1.5px solid #E2E8F0;
+            border-left: 5px solid var(--primary);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .tracker-progress-track {
+            width: 100%;
+            height: 6px;
+            background: #E2E8F0;
+            border-radius: 10px;
+            margin: 12px 0;
+            overflow: hidden;
+        }
+        .tracker-progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* Search Engine & Not Found Request CTA Trigger */
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .search-wrapper i { position: absolute; left: 16px; color: var(--text-muted); }
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: var(--border-radius);
+            outline: none;
+            font-size: 0.95rem;
+            background: #FFFFFF;
+            box-shadow: var(--shadow-sm);
+        }
+        .search-input:focus { border-color: var(--primary); }
+
+        .request-cta-box {
+            background: #FEF2F2;
+            border: 1px dashed rgba(220, 38, 38, 0.3);
+            border-radius: var(--border-radius);
+            padding: 14px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Catalog Layout Components */
+        .category-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        .category-scroll::-webkit-scrollbar { display: none; }
+        .cat-chip {
+            white-space: nowrap;
+            padding: 8px 16px;
+            background: var(--card-bg);
+            border: 1px solid #E2E8F0;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .cat-chip.active { background: var(--accent-dark); color: white; border-color: var(--accent-dark); }
+
+        .list-view-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            border: 1px solid #F1F5F9;
+        }
+        .prod-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        .prod-item-row:last-child { border-bottom: none; }
+        .prod-info-side h4 { font-size: 0.95rem; font-weight: 500; }
+        .prod-info-side span { font-size: 0.85rem; color: var(--primary); font-weight: 600; }
+        
+        .btn-add-item {
+            background: #FEF2F2;
+            color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-add-item:active { background: var(--primary); color: white; }
+
+        /* --- CART & TRACKING TIMELINE ELEMENTS --- */
+        .cart-item-row {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E2E8F0;
+        }
+        .qty-control { display: flex; align-items: center; gap: 12px; }
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #CBD5E1;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Roadmap Timeline Infrastructure */
+        .track-timeline { position: relative; padding-left: 28px; margin-top: 16px; }
+        .track-timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #E2E8F0;
+        }
+        .track-node { position: relative; padding-bottom: 24px; }
+        .track-node::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #CBD5E1;
+            border: 3px solid white;
+            box-shadow: var(--shadow-sm);
+        }
+        .track-node.active::before { background: var(--success); box-shadow: 0 0 0 4px rgba(34,197,94,0.2); }
+        .track-node.active h5 { color: var(--success); font-weight: 600; }
+
+        /* QRIS Graphic Framework */
+        .qris-box {
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            margin: 16px 0;
+            border: 1px solid #E2E8F0;
+        }
+        .qris-img {
+            max-width: 240px;
+            width: 100%;
+            margin: 12px auto;
+            border: 1px solid #E2E8F0;
+            padding: 8px;
+            border-radius: 12px;
+            display: block;
+        }
+        .upload-preview-box {
+            border: 2px dashed #CBD5E1;
+            padding: 24px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            cursor: pointer;
+            background: #F8FAFC;
+        }
+
+        /* --- STICKY NAVIGATION CONTROLS BOTTOM BAR --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 76px;
+            background: var(--card-bg);
+            border-top: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 500;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .nav-item.active { color: var(--primary); font-weight: 600; }
+        .nav-item i { font-size: 1.3rem; margin-bottom: 4px; }
+
+        /* --- ADMIN STANDALONE INTERFACE SYSTEM --- */
+        #admin-panel {
+            background: #0F172A;
+            color: #F8FAFC;
+            min-height: 100vh;
+            padding: 24px 16px 100px;
+        }
+        .admin-grid-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .admin-stat-card {
+            background: #1E293B;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            border: 1px solid #334155;
+        }
+        .admin-stat-card h3 { font-size: 1.4rem; font-weight: 700; margin-top: 4px; }
+        .admin-order-card {
+            background: #1E293B;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #334155;
+        }
+        .admin-control-select {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            width: 100%;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        /* Floating AI Assistant Chat Window */
+        #ai-trigger-fab {
+            position: fixed;
+            bottom: 96px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent-dark);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            z-index: 8000;
+        }
+        #ai-chat-window {
+            position: fixed;
+            bottom: 165px;
+            right: 20px;
+            width: calc(100% - 40px);
+            max-width: 360px;
+            height: 400px;
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            z-index: 8000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #E2E8F0;
+        }
+
+        @keyframes zoomIn { from { transform: scale(0.96); opacity: 0.8; } to { transform: scale(1.04); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <audio id="snd-kling" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav" preload="auto"></audio>
+
+    <div id="splash-screen">
+        <div class="splash-logo">CAMPUS<span>JASTIP</span></div>
+        <p style="font-weight:300; font-size:0.9rem; opacity:0.8; margin-top:5px;">Startup Delivery System v2026</p>
+        <div class="progress-container">
+            <div class="progress-bar" id="splash-progress"></div>
+        </div>
+    </div>
+
+    <div id="welcome-screen" class="hidden">
+        <div class="hero-card" data-aos="zoom-in">
+            <div style="font-size:2.5rem; margin-bottom:12px;">🍛</div>
+            <h2 class="hero-title">President University <span>Campus Jastip</span></h2>
+            <p class="hero-desc">Platform logistik kurir jastip modern eksklusif mahasiswa Jababeka. Instan, transparan, anti-bingung.</p>
+            <div class="highlight-grid">
+                <div class="hl-item"><i class="fa-solid fa-circle-check"></i> Antar Sampai Kamar</div>
+                <div class="hl-item"><i class="fa-solid fa-circle-check"></i> Antrean Transparan</div>
+                <div class="hl-item"><i class="fa-solid fa-circle-check"></i> Integrasi Otomatis</div>
+                <div class="hl-item"><i class="fa-solid fa-circle-check"></i> Custom Request</div>
+            </div>
+            <button class="btn-premium" onclick="closeWelcomeScreen()">Mulai Pesan Jastip</button>
+        </div>
+    </div>
+
+    <div id="auth-screen" class="container hidden">
+        <div style="background:white; padding:32px; border-radius:var(--border-radius-lg); box-shadow:var(--shadow-md); margin-top: 40px;">
+            <h3 style="margin-bottom:6px; font-weight:700;">Buat Profil Pemesan</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:24px;">Lengkapi data satu kali untuk memicu sistem automasi invoice.</p>
+            <form onsubmit="handleCustomerRegistration(event)">
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="auth-name" class="form-control" placeholder="Contoh: Michael Iskandar" required>
+                </div>
+                <div class="form-group">
+                    <label>No. WhatsApp Aktif</label>
+                    <input type="tel" id="auth-phone" class="form-control" placeholder="Contoh: 08123456789" required>
+                </div>
+                <button type="submit" class="btn-premium" style="margin-top:12px;">Simpan Profil Akun</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-interface" class="hidden">
+        <header class="glass-effect">
+            <div class="logo-text" onclick="switchView('home')">CAMPUS<span>JASTIP</span></div>
+            <div class="header-actions">
+                <span id="op-status" style="font-size:0.75rem; font-weight:700; padding:4px 10px; border-radius:12px; margin-right:8px; background:#DCFCE7; color:#15803D;">🟢 OPERASIONAL</span>
+                <i class="fa-regular fa-bell" onclick="switchView('notifications')"><span class="badge" id="notif-badge">0</span></i>
+                <i class="fa-regular fa-circle-user" onclick="switchView('profile')"></i>
+            </div>
+        </header>
+
+        <div id="view-home" class="container view-section">
+            
+            <div id="home-active-tracker-container"></div>
+
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="main-search" class="search-input" placeholder="Cari kuliner, cemilan, minuman kampusan..." oninput="handleRealtimeSearchEngine(this.value)">
+            </div>
+
+            <div id="request-cta" class="request-cta-box hidden">
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">❌ Menu tidak ditemukan di katalog resmi?</p>
+                <button class="btn-premium" style="padding:8px 16px; font-size:0.8rem; background:var(--accent-dark); width:auto; margin:0 auto;" onclick="switchView('request')">❗ Request Barang Custom</button>
+            </div>
+
+            <div class="category-scroll" id="category-chips"></div>
+            <div style="font-weight:600; font-size:1.05rem; margin-bottom:12px;">Katalog Menu Jastip</div>
+            <div class="list-view-container" id="products-catalog"></div>
+        </div>
+
+        <div id="view-request" class="container view-section hidden">
+            <h3 style="font-weight:700; margin-bottom:6px;">Custom Request Barang</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Titip barang apa saja dari luar yang tidak tercantum dalam menu reguler kami.</p>
+            
+            <form onsubmit="handleCustomRequestSubmission(event)" style="background:white; padding:20px; border-radius:var(--border-radius); box-shadow:var(--shadow-sm);">
+                <div class="form-group">
+                    <label>Nama Barang / Menu *</label>
+                    <input type="text" id="req-name" class="form-control" placeholder="Contoh: Sate Taichan Senayan" required>
+                </div>
+                <div class="form-group">
+                    <label>Kategori *</label>
+                    <select id="req-cat" class="form-control" required>
+                        <option value="Makanan">Makanan</option>
+                        <option value="Minuman">Minuman</option>
+                        <option value="Barang">Barang Umum</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Perkiraan Harga Satuan (Rp) *</label>
+                    <input type="number" id="req-price" class="form-control" placeholder="Contoh: 25000" required>
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi Detail & Spesifikasi *</label>
+                    <textarea id="req-desc" class="form-control" rows="3" placeholder="Contoh: Bungkus plastik terpisah, bumbu pedas dipisah, sate isi dada semua" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Link / Referensi Gambar (Opsional)</label>
+                    <input type="url" id="req-link" class="form-control" placeholder="https://instagram.com/toko">
+                </div>
+                <div class="form-group">
+                    <label>Tingkat Prioritas Pengiriman</label>
+                    <select id="req-priority" class="form-control">
+                        <option value="Normal">Normal (Sesuai Antrean Standar)</option>
+                        <option value="Cepat">Cepat (Prioritas Menengah)</option>
+                        <option value="Mendesak">Mendesak (Urgensi Tinggi Kampus)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-premium">Kirim Pengajuan Custom Request</button>
+            </form>
+        </div>
+
+        <div id="view-cart" class="container view-section hidden">
+            <h3 style="font-weight:700; margin-bottom:12px;">Keranjang Belanja</h3>
+            <div id="cart-items-wrapper"></div>
+            
+            <div style="background:white; padding:16px; border-radius:var(--border-radius); margin-top:16px; box-shadow:var(--shadow-sm);">
+                <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:8px;">Pilih Destinasi Kamar Hunian (Biaya Flat):</label>
+                <select id="cart-location-fee" class="form-control" onchange="executeCartRecalculation()">
+                    <option value="3000">Student Housing (SBH) — Rp3.000</option>
+                    <option value="3000">New Student Housing (NBH) — Rp3.000</option>
+                    <option value="5000">Living Apartment — Rp5.000</option>
+                    <option value="5000">Monroe Apartment — Rp5.000</option>
+                    <option value="6000">Graha Asri Area — Rp6.000</option>
+                    <option value="5000">Kost Luar Sekitar Kampus — Rp5.000</option>
+                </select>
+            </div>
+
+            <div style="background:white; padding:16px; border-radius:var(--border-radius); margin-top:12px; box-shadow:var(--shadow-sm);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.9rem;">
+                    <span>Subtotal Produk</span><span id="txt-subtotal">Rp0</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.9rem;">
+                    <span>Biaya Jastip</span><span id="txt-fee">Rp0</span>
+                </div>
+                <hr style="border:none; border-top:1px solid #E2E8F0; margin:8px 0;">
+                <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.1rem; color:var(--primary);">
+                    <span>Total Transaksi</span><span id="txt-grandtotal">Rp0</span>
+                </div>
+            </div>
+            <button class="btn-premium" style="margin-top:16px;" onclick="initiateCheckoutFlow()">Lanjut Pemenuhan Alamat</button>
+        </div>
+
+        <div id="view-checkout" class="container view-section hidden">
+            <h3 style="font-weight:700; margin-bottom:16px;">Detail Alamat & Pembayaran</h3>
+            
+            <div style="background:white; padding:20px; border-radius:var(--border-radius); box-shadow:var(--shadow-sm); margin-bottom:16px;">
+                <h4 style="margin-bottom:12px; font-size:1rem; border-bottom:1px solid #F1F5F9; padding-bottom:6px;">📍 Lokasi Antar Kamar Kost/Dorm</h4>
+                <div class="form-group">
+                    <label>Gedung / Tower / Cluster *</label>
+                    <input type="text" id="co-tower" class="form-control" placeholder="Contoh: NBH Tower Melati / Kost Beverly" required>
+                </div>
+                <div class="form-group">
+                    <label>Lantai & Nomor Kamar *</label>
+                    <input type="text" id="co-room" class="form-control" placeholder="Contoh: Lantai 3 Room 305" required>
+                </div>
+                <div class="form-group">
+                    <label>Patokan Lokasi Spesifik *</label>
+                    <input type="text" id="co-landmark" class="form-control" placeholder="Contoh: Depan dispenser / sebelah lift barat" required>
+                </div>
+            </div>
+
+            <div style="background:white; padding:20px; border-radius:var(--border-radius); box-shadow:var(--shadow-sm);">
+                <h4 style="margin-bottom:12px; font-size:1rem; border-bottom:1px solid #F1F5F9; padding-bottom:6px;">💳 Pintu Gerbang QRIS Otomatis</h4>
+                <div class="qris-box">
+                    <img src="WhatsApp Image 2026-06-12 at 13.50.18.jpeg" id="target-qris-node" class="qris-img" alt="QRIS Matrix Engine" onerror="executeQrisFallbackHandler(this)">
+                    <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Silakan scan kode QRIS universal di atas melalui e-wallet / m-banking Anda sebesar:</p>
+                    <h3 style="color:var(--primary); font-weight:700; font-size:1.4rem; margin-top:4px;" id="qris-grand-amount">Rp0</h3>
+                </div>
+
+                <div class="form-group" style="margin-top:12px;">
+                    <label>Upload Bukti Transfer Resmi *</label>
+                    <div class="upload-preview-box" onclick="document.getElementById('file-upload').click()">
+                        <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.8rem; color:var(--text-muted);"></i>
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Klik untuk mengunggah berkas screenshot</p>
+                        <input type="file" id="file-upload" accept="image/*" class="hidden" onchange="convertPaymentImageToBase64(this)">
+                    </div>
+                    <img id="upload-preview-node" class="hidden" src="" alt="Preview Bukti" style="max-width:100%; max-height:160px; margin-top:12px; border-radius:8px; border:1px solid #E2E8F0;">
+                </div>
+
+                <button class="btn-premium" style="background:var(--success); box-shadow:0 4px 14px rgba(34,197,94,0.3);" onclick="executeFinalOrderCompilation()">Kirim Konfirmasi & Unduh Invoice</button>
+            </div>
+        </div>
+
+        <div id="view-tracking" class="container view-section hidden">
+            <h3 style="font-weight:700; margin-bottom:12px;">Pelacakan Transaksi</h3>
+            <div id="tracking-logs-wrapper"></div>
+        </div>
+
+        <div id="view-notifications" class="container view-section hidden">
+            <h3 style="font-weight:700; margin-bottom:12px;">Notifikasi</h3>
+            <div id="notif-list-wrapper"></div>
+        </div>
+
+        <div id="view-profile" class="container view-section hidden">
+            <div style="background:white; padding:24px; border-radius:var(--border-radius-lg); text-align:center; box-shadow:var(--shadow-sm);">
+                <div style="width:64px; height:64px; background:#F1F5F9; border-radius:50%; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--text-muted);"><i class="fa-solid fa-user"></i></div>
+                <h3 id="profile-name-node" style="font-weight:700;">User Account</h3>
+                <p id="profile-phone-node" style="color:var(--text-muted); font-size:0.85rem; margin-bottom:16px;">WhatsApp</p>
+                <button class="btn-premium" style="background:var(--accent-dark); padding:10px; font-size:0.85rem;" onclick="triggerAdminLoginGateModal()">Masuk Portal Keuangan Admin</button>
+            </div>
+        </div>
+
+        <nav class="bottom-nav glass-effect">
+            <div class="nav-item active" id="nav-home" onclick="switchView('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+            <div class="nav-item" id="nav-cart" onclick="switchView('cart')"><i class="fa-solid fa-cart-shopping"></i><span>Keranjang</span></div>
+            <div class="nav-item" id="nav-tracking" onclick="switchView('tracking')"><i class="fa-solid fa-route"></i><span>Tracking</span></div>
+            <div class="nav-item" id="nav-profile" onclick="switchView('profile')"><i class="fa-solid fa-user-gear"></i><span>Profil</span></div>
+        </nav>
+    </div>
+
+    <div id="admin-panel" class="hidden">
+        <div style="display:flex; justify-content:between; align-items:center; margin-bottom:24px; border-bottom:1px solid #334155; padding-bottom:12px;">
+            <div>
+                <h2 style="font-weight:700;">Fintech Dashboard Control</h2>
+                <p style="color:#94A3B8; font-size:0.8rem;">President University Infrastructure v2026</p>
+            </div>
+            <button class="btn-premium" style="background:var(--primary); padding:8px 16px; font-size:0.85rem; width:auto;" onclick="exitAdminPanelControlView()">Logout Admin</button>
+        </div>
+
+        <div class="admin-grid-metrics">
+            <div class="admin-stat-card"><span>Total Order Hari Ini</span><h3 id="adm-m1">0</h3></div>
+            <div class="admin-stat-card"><span>Order Pending</span><h3 id="adm-m2" style="color:var(--warning);">0</h3></div>
+            <div class="admin-stat-card"><span>Order Diproses</span><h3 id="adm-m3" style="color:var(--info);">0</h3></div>
+            <div class="admin-stat-card"><span>Order Selesai</span><h3 id="adm-m4" style="color:var(--success);">0</h3></div>
+            <div class="admin-stat-card"><span>Total Pendapatan</span><h3 id="adm-m5">Rp0</h3></div>
+            <div class="admin-stat-card"><span>Total Laba Fee Jastip</span><h3 id="adm-m6" style="color:var(--success);">Rp0</h3></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h4 style="font-weight:600;">Log Antrean Transaksi Masuk</h4>
+            <button class="btn-premium" style="background:#22C55E; font-size:0.75rem; padding:6px 12px; width:auto;" onclick="exportAdminMetricsToExcelSheet()">Export Excel</button>
+        </div>
+        <div id="admin-orders-queue-wrapper"></div>
+
+        <h4 style="font-weight:600; margin:24px 0 12px;">Log Pengajuan Custom Request Barang</h4>
+        <div id="admin-requests-queue-wrapper"></div>
+    </div>
+
+    <div id="ai-trigger-fab" onclick="toggleFloatingAIAssistant()"><i class="fa-solid fa-robot"></i></div>
+    <div id="ai-chat-window" class="hidden">
+        <div style="background:var(--accent-dark); color:white; padding:14px; font-weight:600; font-size:0.85rem; display:flex; justify-content:space-between; align-items:center;">
+            <span>🤖 CJ Assistant Real-Time Help</span>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleFloatingAIAssistant()"></i>
+        </div>
+        <div id="ai-msg-box" style="flex:1; padding:12px; overflow-y:auto; font-size:0.8rem; background:#F1F5F9; display:flex; flex-direction:column; gap:8px;">
+            <div style="background:white; padding:10px; border-radius:12px; align-self:flex-start; max-width:85%;">Halo! Saya CJ Assistant. Ada kendala operasional jastip di lingkungan President University? Silakan pilih instruksi otomatis di bawah ini.</div>
+        </div>
+        <div style="padding:10px; background:white; border-top:1px solid #E2E8F0; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="cat-chip" style="font-size:0.7rem; padding:4px 8px;" onclick="executeAIBotMacroFaq('Cara Pesan')">Cara Pesan?</button>
+            <button class="cat-chip" style="font-size:0.7rem; padding:4px 8px;" onclick="executeAIBotMacroFaq('Tarif Jastip')">Tarif Jastip?</button>
+            <button class="cat-chip" style="font-size:0.7rem; padding:4px 8px;" onclick="executeAIBotMacroFaq('Metode Pembayaran')">Cara Bayar?</button>
+        </div>
+    </div>
+
+
+    <script>
+        /* ==========================================================================
+           5. DATA MODEL INVENTORY DATABASE MATRIX (RELIABLE SPECIFICATIONS)
+           ========================================================================== */
+        const MASTER_PRODUCTS_INVENTORY = [
+            // 🍛 MAKANAN (1–25)
+            { id: 1, name: "Nasi Goreng Telur", cat: "Makanan", price: 15000 },
+            { id: 2, name: "Nasi Goreng Ayam", cat: "Makanan", price: 18000 },
+            { id: 3, name: "Nasi Goreng Spesial", cat: "Makanan", price: 22000 },
+            { id: 4, name: "Mie Goreng", cat: "Makanan", price: 12000 },
+            { id: 5, name: "Mie Rebus", cat: "Makanan", price: 12000 },
+            { id: 6, name: "Mie Ayam", cat: "Makanan", price: 15000 },
+            { id: 7, name: "Bakso Kuah", cat: "Makanan", price: 15000 },
+            { id: 8, name: "Bakso Urat", cat: "Makanan", price: 18000 },
+            { id: 9, name: "Soto Ayam", cat: "Makanan", price: 15000 },
+            { id: 10, name: "Soto Daging", cat: "Makanan", price: 20000 },
+            { id: 11, name: "Ayam Geprek", cat: "Makanan", price: 18000 },
+            { id: 12, name: "Ayam Penyet", cat: "Makanan", price: 18000 },
+            { id: 13, name: "Ayam Goreng Crispy", cat: "Makanan", price: 17000 },
+            { id: 14, name: "Pecel Lele", cat: "Makanan", price: 16000 },
+            { id: 15, name: "Ikan Bakar", cat: "Makanan", price: 25000 },
+            { id: 16, name: "Nasi Uduk", cat: "Makanan", price: 10000 },
+            { id: 17, name: "Nasi Kuning", cat: "Makanan", price: 12000 },
+            { id: 18, name: "Nasi Campur", cat: "Makanan", price: 18000 },
+            { id: 19, name: "Capcay", cat: "Makanan", price: 18000 },
+            { id: 20, name: "Kwetiau Goreng", cat: "Makanan", price: 18000 },
+            { id: 21, name: "Martabak Telur", cat: "Makanan", price: 20000 },
+            { id: 22, name: "Sate Ayam", cat: "Makanan", price: 20000 },
+            { id: 23, name: "Sate Kambing", cat: "Makanan", price: 28000 },
+            { id: 24, name: "Tahu Tempe Goreng", cat: "Makanan", price: 8000 },
+            { id: 25, name: "Mie Tek-Tek", cat: "Makanan", price: 15000 },
+
+            // 🍟 MAKANAN RINGAN (26–32)
+            { id: 26, name: "Kentang Goreng", cat: "Makanan Ringan", price: 12000 },
+            { id: 27, name: "Tahu Crispy", cat: "Makanan Ringan", price: 10000 },
+            { id: 28, name: "Cireng", cat: "Makanan Ringan", price: 10000 },
+            { id: 29, name: "Cimol", cat: "Makanan Ringan", price: 8000 },
+            { id: 30, name: "Batagor", cat: "Makanan Ringan", price: 15000 },
+            { id: 31, name: "Siomay", cat: "Makanan Ringan", price: 15000 },
+            { id: 32, name: "Roti Bakar", cat: "Makanan Ringan", price: 12000 },
+
+            // 🥤 MINUMAN (33–40)
+            { id: 33, name: "Es Teh Manis", cat: "Minuman", price: 5000 },
+            { id: 34, name: "Es Jeruk", cat: "Minuman", price: 7000 },
+            { id: 35, name: "Es Kopi Susu", cat: "Minuman", price: 10000 },
+            { id: 36, name: "Kopi Hitam", cat: "Minuman", price: 5000 },
+            { id: 37, name: "Teh Tarik", cat: "Minuman", price: 8000 },
+            { id: 38, name: "Susu Coklat", cat: "Minuman", price: 10000 },
+            { id: 39, name: "Es Doger", cat: "Minuman", price: 10000 },
+            { id: 40, name: "Es Campur", cat: "Minuman", price: 12000 }
+        ];
+
+        /* OPERATIONAL TRANSIENT APP MEMORY LIFECYCLE STATS */
+        let cart = [];
+        let activeUserSession = null;
+        let selectedCategoryFilter = "Semua";
+        let transientBase64Proof = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            AOS.init({ duration: 800, once: true });
+            runSplashProgressLoaderEngine();
+            loadPersistedUserSessionState();
+            renderCategoryChipsComponent();
+            renderCatalogItemsComponent();
+            evaluateGlobalCartBadges();
+        });
+
+        function runSplashProgressLoaderEngine() {
+            const bar = document.getElementById("splash-progress");
+            let width = 0;
+            const token = setInterval(() => {
+                width += 8;
+                if(width <= 100) bar.style.width = width + "%";
+                if(width >= 105) {
+                    clearInterval(token);
+                    document.getElementById("splash-screen").style.display = "none";
+                    dispatchNavigationTargetRouting();
+                }
+            }, 40);
+        }
+
+        function loadPersistedUserSessionState() {
+            const data = localStorage.getItem("cj_user_profile");
+            if(data) {
+                activeUserSession = JSON.parse(data);
+                document.getElementById("profile-name-node").innerText = activeUserSession.name;
+                document.getElementById("profile-phone-node").innerText = activeUserSession.phone;
+            }
+        }
+
+        function dispatchNavigationTargetRouting() {
+            if(!localStorage.getItem("cj_marketing_seen")) {
+                document.getElementById("welcome-screen").classList.remove("hidden");
+            } else if(!activeUserSession) {
+                document.getElementById("auth-screen").classList.remove("hidden");
+            } else {
+                document.getElementById("app-interface").classList.remove("hidden");
+                switchView("home");
+            }
+        }
+
+        function closeWelcomeScreen() {
+            localStorage.setItem("cj_marketing_seen", "true");
+            document.getElementById("welcome-screen").classList.add("hidden");
+            dispatchNavigationTargetRouting();
+        }
+
+        function handleCustomerRegistration(e) {
+            e.preventDefault();
+            const name = document.getElementById("auth-name").value.trim();
+            const phone = document.getElementById("auth-phone").value.trim();
+            if(!name || !phone) return;
+
+            activeUserSession = { name, phone };
+            localStorage.setItem("cj_user_profile", JSON.stringify(activeUserSession));
+            document.getElementById("auth-screen").classList.add("hidden");
+            loadPersistedUserSessionState();
+            dispatchNavigationTargetRouting();
+            dispatchAudioNotificationSound();
+        }
+
+        /* ==========================================================================
+           6. CATALOG INTERFACE RENDERING ENGINE
+           ========================================================================== */
+        function renderCategoryChipsComponent() {
+            const categories = ["Semua", "Makanan", "Makanan Ringan", "Minuman"];
+            const container = document.getElementById("category-chips");
+            container.innerHTML = categories.map(cat => `
+                <div class="cat-chip ${cat === selectedCategoryFilter ? 'active' : ''}" onclick="executeCategoryFiltering('${cat}')">${cat}</div>
+            `).join("");
+        }
+
+        function executeCategoryFiltering(cat) {
+            selectedCategoryFilter = cat;
+            renderCategoryChipsComponent();
+            renderCatalogItemsComponent();
+        }
+
+        function handleRealtimeSearchEngine(query) {
+            const sanitized = query.trim().toLowerCase();
+            renderCatalogItemsComponent(sanitized);
+            
+            const reqCta = document.getElementById("request-cta");
+            if(sanitized.length > 0) {
+                const matches = MASTER_PRODUCTS_INVENTORY.filter(p => p.name.toLowerCase().includes(sanitized));
+                if(matches.length === 0) reqCta.classList.remove("hidden");
+                else reqCta.classList.add("hidden");
+            } else {
+                reqCta.classList.add("hidden");
+            }
+        }
+
+        function renderCatalogItemsComponent(searchQuery = "") {
+            const container = document.getElementById("products-catalog");
+            let source = MASTER_PRODUCTS_INVENTORY;
+
+            if(selectedCategoryFilter !== "Semua") {
+                source = source.filter(p => p.cat === selectedCategoryFilter);
+            }
+            if(searchQuery !== "") {
+                source = source.filter(p => p.name.toLowerCase().includes(searchQuery));
+            }
+
+            if(source.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:32px; color:var(--text-muted); font-size:0.85rem;">Menu jastip tidak terdaftar di sistem...</div>`;
+                return;
+            }
+
+            container.innerHTML = source.map(p => `
+                <div class="prod-item-row">
+                    <div class="prod-info-side">
+                        <h4>${p.name}</h4>
+                        <span>Rp ${p.price.toLocaleString('id-ID')}</span>
+                    </div>
+                    <button class="btn-add-item" onclick="executeAddItemToCart(${p.id})">+ Tambah</button>
+                </div>
+            `).join("");
+        }
+
+        /* ==========================================================================
+           7. CUSTOM REQUEST SYSTEM MANAGEMENT ENGINE
+           ========================================================================== */
+        function handleCustomRequestSubmission(e) {
+            e.preventDefault();
+            const name = document.getElementById("req-name").value.trim();
+            const cat = document.getElementById("req-cat").value;
+            const price = parseFloat(document.getElementById("req-price").value);
+            const desc = document.getElementById("req-desc").value.trim();
+            const link = document.getElementById("req-link").value.trim();
+            const priority = document.getElementById("req-priority").value;
+
+            if(!name || !price || !desc) {
+                Swal.fire("Gagal Validasi", "Kolom bertanda bintang wajib diisi lengkap.", "warning");
+                return;
+            }
+
+            let currentRequests = JSON.parse(localStorage.getItem("cj_requests") || "[]");
+            const newRequest = {
+                requestId: "REQ-" + Math.floor(1000 + Math.random() * 9000),
+                customerName: activeUserSession.name,
+                customerPhone: activeUserSession.phone,
+                name, cat, price, desc, link, priority,
+                status: "Menunggu Peninjauan Admin",
+                timestamp: new Date().toLocaleString('id-ID')
+            };
+
+            currentRequests.push(newRequest);
+            localStorage.setItem("cj_requests", JSON.stringify(currentRequests));
+
+            dispatchAudioNotificationSound();
+            injectRealtimeSystemNotification("Request Diajukan", `Request custom ${newRequest.requestId} berhasil dikirim ke admin.`);
+            
+            Swal.fire({
+                title: "Request Terkirim!",
+                text: "Admin akan memverifikasi dan merilis item custom Anda ke dalam antrean sistem jastip.",
+                icon: "success",
+                confirmButtonText: "Kembali ke Home"
+            }).then(() => {
+                e.target.reset();
+                switchView("home");
+            });
+        }
+
+        /* ==========================================================================
+           8. CART COMPUTATION MACHINERY
+           ========================================================================== */
+        function executeAddItemToCart(id) {
+            const item = MASTER_PRODUCTS_INVENTORY.find(p => p.id === id);
+            const exist = cart.find(i => i.id === id);
+
+            if(exist) {
+                exist.qty++;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            evaluateGlobalCartBadges();
+            dispatchAudioNotificationSound();
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: `${item.name} masuk keranjang`, showConfirmButton: false, timer: 1000 });
+        }
+
+        function evaluateGlobalCartBadges() {
+            const count = cart.reduce((sum, i) => sum + i.qty, 0);
+            document.getElementById("notif-badge").innerText = count;
+        }
+
+        function renderCartViewContents() {
+            const wrapper = document.getElementById("cart-items-wrapper");
+            if(cart.length === 0) {
+                wrapper.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted); font-size:0.9rem;">Keranjang Anda masih kosong.</div>`;
+                return;
+            }
+
+            wrapper.innerHTML = cart.map(item => `
+                <div class="cart-item-row">
+                    <div style="flex:1;">
+                        <h4 style="font-size:0.9rem; font-weight:600;">${item.name}</h4>
+                        <span style="font-size:0.85rem; color:var(--primary); font-weight:600;">Rp ${(item.price * item.qty).toLocaleString('id-ID')}</span>
+                    </div>
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="modifyCartQty(${item.id}, -1)"><i class="fa-solid fa-minus"></i></button>
+                        <span style="font-weight:600;">${item.qty}</span>
+                        <button class="qty-btn" onclick="modifyCartQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
+            `).join("");
+            executeCartRecalculation();
+        }
+
+        function modifyCartQty(id, delta) {
+            const index = cart.findIndex(i => i.id === id);
+            if(index === -1) return;
+
+            cart[index].qty += delta;
+            if(cart[index].qty <= 0) cart.splice(index, 1);
+            evaluateGlobalCartBadges();
+            renderCartViewContents();
+        }
+
+        function executeCartRecalculation() {
+            const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            const fee = cart.length > 0 ? parseFloat(document.getElementById("cart-location-fee").value) : 0;
+            const total = subtotal + fee;
+
+            document.getElementById("txt-subtotal").innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            document.getElementById("txt-fee").innerText = `Rp ${fee.toLocaleString('id-ID')}`;
+            document.getElementById("txt-grandtotal").innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        function initiateCheckoutFlow() {
+            if(cart.length === 0) {
+                Swal.fire("Keranjang Kosong", "Masukkan barang ke dalam keranjang belanja terlebih dahulu.", "warning");
+                return;
+            }
+            switchView("checkout");
+            
+            const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            const fee = parseFloat(document.getElementById("cart-location-fee").value);
+            document.getElementById("qris-grand-amount").innerText = `Rp ${(subtotal + fee).toLocaleString('id-ID')}`;
+        }
+
+        /* ==========================================================================
+           9. HARDENED TRANSACTION CHECKOUT & QRIS FRAMEWORK
+           ========================================================================== */
+        function executeQrisFallbackHandler(imgNode) {
+            imgNode.onerror = null; 
+            imgNode.style.display = "none";
+            
+            const noticeBox = document.createElement("div");
+            noticeBox.style.padding = "20px";
+            noticeBox.style.background = "#FEF2F2";
+            noticeBox.style.color = "var(--primary)";
+            noticeBox.style.border = "1px dashed var(--primary)";
+            noticeBox.style.borderRadius = "12px";
+            noticeBox.style.fontSize = "0.85rem";
+            noticeBox.style.fontWeight = "600";
+            noticeBox.innerHTML = `⚠️ Berkas QRIS Jastip Utama tidak tersedia.<br><span style="font-weight:400; font-size:0.75rem; color:var(--text-muted)">Silakan hubungi admin langsung untuk koordinasi transfer bank manual.</span>`;
+            
+            imgNode.parentNode.insertBefore(noticeBox, imgNode);
+        }
+
+        function convertPaymentImageToBase64(input) {
+            if(input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    transientBase64Proof = e.target.result;
+                    const preview = document.getElementById("upload-preview-node");
+                    preview.src = e.target.result;
+                    preview.classList.remove("hidden");
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function executeFinalOrderCompilation() {
+            const tower = document.getElementById("co-tower").value.trim();
+            const room = document.getElementById("co-room").value.trim();
+            const landmark = document.getElementById("co-landmark").value.trim();
+
+            if(!tower || !room || !landmark) {
+                Swal.fire("Formulir Kosong", "Seluruh baris parameter detail alamat kamar wajib diisi lengkap.", "error");
+                return;
+            }
+            if(!transientBase64Proof) {
+                Swal.fire("Bukti Bayar Kosong", "Sistem memerlukan lampiran berkas bukti transfer QRIS untuk proses validasi antrean.", "error");
+                return;
+            }
+
+            Swal.fire({ title: 'Memproses Pesanan...', text: 'Menyimpan entri antrean jastip...', icon: 'info', allowOutsideClick: false, showConfirmButton: false, timer: 1200 }).then(() => {
+                let currentOrders = JSON.parse(localStorage.getItem("cj_master_orders_list") || "[]");
+                const generatedId = "CJ-" + Math.floor(10000 + Math.random() * 90000);
+                
+                const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+                const fee = parseFloat(document.getElementById("cart-location-fee").value);
+
+                const finalOrderObject = {
+                    orderId: generatedId,
+                    customerName: activeUserSession.name,
+                    customerPhone: activeUserSession.phone,
+                    tower, room, landmark,
+                    items: cart,
+                    subtotal, jastipFee: fee,
+                    status: "Menunggu Verifikasi",
+                    adminNote: "Menunggu tim admin memvalidasi mutasi QRIS",
+                    timestamp: new Date().toLocaleString('id-ID'),
+                    proof: transientBase64Proof
+                };
+
+                currentOrders.push(finalOrderObject);
+                localStorage.setItem("cj_master_orders_list", JSON.stringify(currentOrders));
+                
+                generateAutomatedInvoicePDF(finalOrderObject);
+            });
+        }
+
+        /* ==========================================================================
+           10. ENTERPRISE PDF INVOICE SYSTEM (jsPDF Matrix)
+           ========================================================================== */
+        function generateAutomatedInvoicePDF(order) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            // Header Structural Layer
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 210, 35, 'F');
+            
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(255, 255, 255);
+            doc.text("CAMPUS JASTIP", 14, 18);
+            
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(226, 232, 240);
+            doc.text("President University Startup Delivery System", 14, 25);
+
+            // Metadata Context Block
+            doc.setTextColor(17, 24, 39);
+            doc.setFontSize(11);
+            doc.setFont("Helvetica", "bold");
+            doc.text("FAKTUR INVOICE RESMI", 14, 48);
+            
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(9);
+            doc.text(`ID Transaksi  : ${order.orderId}`, 14, 55);
+            doc.text(`Waktu Sistem  : ${order.timestamp}`, 14, 61);
+            doc.text(`Nama Pemesan : ${order.customerName} (${order.customerPhone})`, 14, 67);
+            doc.text(`Alamat Antar  : ${order.tower}, Kamar ${order.room} [${order.landmark}]`, 14, 73);
+
+            doc.setDrawColor(226, 232, 240);
+            doc.line(14, 78, 196, 78);
+
+            // Table Product Configuration Matrix
+            let currentY = 86;
+            doc.setFont("Helvetica", "bold");
+            doc.text("Item Deskripsi Menu", 14, currentY);
+            doc.text("Total Harga", 196, currentY, { align: "right" });
+            
+            doc.setFont("Helvetica", "normal");
+            order.items.forEach(item => {
+                currentY += 8;
+                doc.text(`${item.name} (x${item.qty})`, 14, currentY);
+                doc.text(`Rp ${(item.price * item.qty).toLocaleString('id-ID')}`, 196, currentY, { align: "right" });
+            });
+
+            currentY += 10;
+            doc.line(14, currentY, 196, currentY);
+
+            // Computational Calculation Layout
+            currentY += 8;
+            doc.text("Subtotal Belanja Produk:", 120, currentY);
+            doc.text(`Rp ${order.subtotal.toLocaleString('id-ID')}`, 196, currentY, { align: "right" });
+            
+            currentY += 6;
+            doc.text("Komisi Jastip Flat:", 120, currentY);
+            doc.text(`Rp ${order.jastipFee.toLocaleString('id-ID')}`, 196, currentY, { align: "right" });
+            
+            currentY += 8;
+            doc.setFont("Helvetica", "bold");
+            doc.text("Total Pembayaran Bersih:", 120, currentY);
+            doc.text(`Rp ${(order.subtotal + order.jastipFee).toLocaleString('id-ID')}`, 196, currentY, { align: "right" });
+
+            // Attached Proof Section
+            if(order.proof) {
+                currentY += 12;
+                if(currentY < 210) {
+                    doc.setFont("Helvetica", "bold");
+                    doc.text("LAMPIRAN BUKTI TRANSFER SCREENSHOT:", 14, currentY);
+                    doc.addImage(order.proof, 'JPEG', 14, currentY + 4, 65, 55);
+                }
+            }
+
+            doc.save(`Invoice_Jastip_${order.orderId}.pdf`);
+
+            // Redirection deep-linking engine to WhatsApp routers
+            Swal.fire({
+                title: "Invoice Sukses Terbit",
+                text: "Dokumen PDF otomatis terunduh. Kirim konfirmasi ke kurir jastip untuk memotong antrean.",
+                icon: "success",
+                confirmButtonText: "Kirim File ke WhatsApp Kurir"
+            }).then(() => {
+                const admins = ["089665100330", "087802538459"];
+                const targetAdmin = admins[Math.floor(Math.random() * admins.length)];
+                const msg = `Halo Admin Jastip, saya sudah mengirim pembayaran. Tolong proses antrean ID Order saya: ${order.orderId}`;
+                window.open(`https://wa.me/${targetAdmin}?text=${encodeURIComponent(msg)}`, '_blank');
+                
+                cart = [];
+                transientBase64Proof = null;
+                document.getElementById("file-upload").value = "";
+                document.getElementById("upload-preview-node").classList.add("hidden");
+                evaluateGlobalCartBadges();
+                switchView("tracking");
+            });
+        }
+
+        /* ==========================================================================
+           11. REAL-TIME MULTI-TRACKING ROADMAP ENGINE
+           ========================================================================== */
+        function renderTrackingViewDashboard() {
+            const container = document.getElementById("tracking-logs-wrapper");
+            const globalOrders = JSON.parse(localStorage.getItem("cj_master_orders_list") || "[]");
+            const myOrders = globalOrders.filter(o => o.customerPhone === activeUserSession?.phone).reverse();
+
+            if(myOrders.length === 0) {
+                container.innerHTML = `<p style="text-align:center; padding:40px; color:var(--text-muted); font-size:0.9rem;">Belum ada riwayat pemesanan Jastip atas nama Anda.</p>`;
+                return;
+            }
+
+            const statusArray = ["Menunggu Pembayaran", "Menunggu Verifikasi", "Diproses", "Dibeli", "Diantar", "Hampir Sampai", "Selesai"];
+
+            container.innerHTML = myOrders.map(order => {
+                const activeIndex = statusArray.indexOf(order.status);
+                // System mathematical analytics for dynamic transparent queue position
+                const forwardQueueCount = globalOrders.filter(o => o.status !== "Selesai" && o.status !== "Ditolak" && globalOrders.indexOf(o) < globalOrders.indexOf(order)).length;
+
+                return `
+                    <div style="background:white; padding:20px; border-radius:var(--border-radius); border:1px solid #E2E8F0; margin-bottom:16px; box-shadow:var(--shadow-sm);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:700; color:var(--primary); font-size:1rem;">${order.orderId}</span>
+                            <span style="font-size:0.75rem; background:#FEF3C7; color:#B45309; font-weight:600; padding:4px 10px; border-radius:12px;">${order.status}</span>
+                        </div>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Waktu: ${order.timestamp}</p>
+                        
+                        <div style="background:#F8FAFC; padding:12px; border-radius:8px; margin:12px 0; font-size:0.8rem;">
+                            <div style="margin-bottom:4px;"><i class="fa-solid fa-layer-group text-primary"></i> <b>Posisi Antrean:</b> #${forwardQueueCount + 1}</div>
+                            <div style="margin-bottom:4px;"><i class="fa-solid fa-hourglass-half text-warning"></i> <b>Estimasi Giliran:</b> ${forwardQueueCount * 10} Menit Lagi</div>
+                            <div><i class="fa-solid fa-comment-dots text-info"></i> <b>Update Admin:</b> "${order.adminNote || 'Belum ada catatan'}"</div>
+                        </div>
+
+                        <div class="track-timeline">
+                            ${statusArray.map((st, idx) => `
+                                <div class="track-node ${idx <= activeIndex ? 'active' : ''}">
+                                    <h5 style="font-size:0.8rem; font-weight:${idx === activeIndex ? '700' : '500'};">${st}</h5>
+                                </div>
+                            `).join("")}
+                        </div>
+                        <button class="btn-premium" style="font-size:0.8rem; padding:8px; margin-top:8px; background:var(--accent-dark);" onclick="executeOneClickReorderMechanism('${order.orderId}')">🔁 Reorder 1-Klik</button>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function executeOneClickReorderMechanism(orderId) {
+            const globalOrders = JSON.parse(localStorage.getItem("cj_master_orders_list") || "[]");
+            const target = globalOrders.find(o => o.orderId === orderId);
+            if(!target) return;
+
+            cart = target.items.map(i => ({ ...i, qty: i.qty }));
+            evaluateGlobalCartBadges();
+            switchView("cart");
+            Swal.fire("Sistem Reorder Berhasil", "Seluruh baris item menu lama disalin ulang ke keranjang.", "success");
+        }
+
+        function renderHomeActiveTrackerComponent() {
+            const container = document.getElementById("home-active-tracker-container");
+            const globalOrders = JSON.parse(localStorage.getItem("cj_master_orders_list") || "[]");
+            const activeOrder = globalOrders.filter(o => o.customerPhone === activeUserSession?.phone && o.status !== "Selesai" && o.status !== "Ditolak").pop();
+
+            if(!activeOrder) {
+                container.innerHTML = "";
+                return;
+            }
+
+            const statusArray = ["Menunggu Pembayaran", "Menunggu Verifikasi", "Diproses", "Dibeli", "Diantar", "Hampir Sampai", "Selesai"];
+            const idx = statusArray.indexOf(activeOrder.status);
+            const percentage = (idx / (statusArray.length - 1)) * 100;
+            const forwardQueueCount = globalOrders.filter(o => o.status !== "Selesai" && o.status !== "Ditolak" && globalOrders.indexOf(o) < globalOrders.indexOf(activeOrder)).length;
+
+            container.innerHTML = `
+                <div class="active-tracker-banner" onclick="switchView('tracking')">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.8rem; font-weight:700; color:var(--primary);">PESANAN AKTIF: ${activeOrder.orderId}</span>
+                        <span style="font-size:0.8rem; font-weight:700;">${activeOrder.status}</span>
+                    </div>
+                    <div class="tracker-progress-track">
+                        <div class="tracker-progress-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted);">
+                        <span>Antrean: #${forwardQueueCount + 1} (${forwardQueueCount} order di depan)</span>
+                        <span>Estimasi: ${forwardQueueCount * 10} mnt</span>
+                    </div>
+                    <p style="font-size:0.75rem; margin-top:6px; font-weight:500; color:var(--accent-dark);"><i class="fa-solid fa-bell text-primary"></i> Update: "${activeOrder.adminNote || 'Sedang diverifikasi'}"</p>
+                </div>
+            `;
+        }
+
+        /* ==========================================================================
+           12. FINANCIAL BACKOFFICE OPERATIONS (Kredensial JPMorgan / 292929)
+           ========================================================================== */
+        function triggerAdminLoginGateModal() {
+            Swal.fire({
+                title: "Akses Kontrol Finansial Admin",
+                html: `
+                    <input type="text" id="adm-user" class="swal2-input" placeholder="Username">
+                    <input type="password" id="adm-pass" class="swal2-input" placeholder="Password">
+                `,
+                confirmButtonText: "Verifikasi Otoritas",
+                focusConfirm: false,
+                preConfirm: () => {
+                    const u = document.getElementById("adm-user").value;
+                    const p = document.getElementById("adm-pass").value;
+                    if(u === "JPMorgan" && p === "292929") return true;
+                    Swal.showValidationMessage("Akses ditolak! Kredensial tidak cocok.");
+                    return false;
+                }
+            }).then((res) => {
+                if(res.isConfirmed) {
+                    document.getElementById("app-interface").classList.add("hidden");
+                    document.getElementById("admin-panel").classList.remove("hidden");
+                    renderAdminBackofficeViewEngine();
+                }
+            });
+        }
+
+        function exitAdminPanelControlView() {
+            document.getElementById("admin-panel").classList.add("hidden");
+            document.getElementById("app-interface").classList.remove("hidden");
+            switchView("profile");
+        }
+
+        function renderAdminBackofficeViewEngine() {
+            const orders = JSON.parse(localStorage.getItem("cj_master_orders_list") || "[]");
+            const requests = JSON.parse(localStorage.getItem("cj_requests") || "[]");
+
+            // Compute Key Metrics Stat Cards
+            document.getElementById("adm-m1").innerText = orders.length;
+            document.getElementById("adm-m2").innerText = orders.filter(o => o.status === "Menunggu Verifikasi").length;
+            document.getElementById("adm-m3").innerText = orders.filter(o => o.status === "Diproses").length;
+            document.getElementById("adm-m4").innerText = orders.filter(o => o.status === "Selesai").length;
+            
+            const validOrders = orders.filter(o => o.status !== "Ditolak");
+            const totalRevenue = validOrders.reduce((sum, o) => sum + o.subtotal + o.jastipFee, 0);
+            const totalProfitFees = validOrders.reduce((sum, o) => sum + o.jastipFee, 0);
+
+            document.getElementById("adm-m5").innerText = "Rp " + totalRevenue.toLocaleString('id-ID');
+            document.getElementById("adm-m6").innerText = "Rp " + totalProfitFees.toLocaleString('id-ID');
+
+            // Render Orders Control Queue Cards
+            const ordersWrapper = document.getElementById("admin-orders-queue-wrapper");
+            if(orders.length === 0) {
+                ordersWrapper.innerHTML = `<p style="font-size:0.85rem; color:#94A3B8;">Belum ada rekam jejak order jastip.</p>`;
+            } else {
+                ordersWrapper.innerHTML = [...orders].reverse().map(o => `
+                    <div class="admin-order-card">
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:700;">
+                            <span>ID: ${o.orderId} [${o.customerName}]</span>
+                            <span style="color:var(--warning);">${o.status}</span>
+                        </div>
+                        <div style="font-size:0.75rem; color:#94A3B8; margin:8px 0;">
+                            <p><b>Kost/Dorm:</b> ${o.tower}, Room ${o.room} [Patokan: ${o.landmark}]</p>
+                            <p><b>Kontak WhatsApp:</b> <a href="https://wa.me/${o.customerPhone}" target="_blank" style="color:#22C55E;">${o.customerPhone}</a></p>
+                            <p><b>Pesanan:</b> ${o.items.map(i => `${i.name} (x${i.qty})`).join(", ")}</p>
+                            <p><b>Total Pembayaran:</b> Rp ${(o.subtotal + o.jastipFee).toLocaleString('id-ID')}</p>
+                        </div>
+                        
+                        <div style="margin:10px 0;">
+                            <p style="font-size:0.7rem; color:#94A3B8; margin-bottom:4px;">Pratinjau Bukti Transfer Scan QRIS:</p>
+                            <img src="${o.proof}" style="max-height:100px; border-radius:6px; display:block; border:1px solid #334155;">
+                        </div>
+
+                        <select class="admin-control-select" onchange="executeAdminStatusMutation('${o.orderId}', this.value)">
+                            <option value="">-- Mutasi Alur Logistik Status --</option>
+                            <option value="Diproses">📦 Set ke "Diproses"</option>
+                            <option value="Dibeli">🛒 Set ke "Dibeli"</option>
+                            <option value="Diantar">🚚 Set ke "Diantar"</option>
+                            <option value="Hampir Sampai">🏁 Set ke "Hampir Sampai"</option>
+                            <option value="Selesai">✅ Set ke "Selesai"</option>
+                            <option value="Ditolak">❌ Tolak Pembayaran / Batalkan</option>
+                        </select>
+
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn-premium" style="font-size:0.7rem; padding:6px; background:#1e293b; border:1px solid #334155;" onclick="triggerAdminCustomMessage('${o.orderId}')">💬 Kirim Catatan Khusus</button>
+                            <button class="btn-premium" style="font-size:0.7rem; padding:6px; background:#0ea5e9;" onclick="window.open('https://wa.me/${o.customerPhone}?text=${encodeURIComponent('Halo, pesanan Jastip Anda sedang kami proses.')}', '_blank')">WhatsApp Chat</button>
+                        </div>
+                    </div>
+                `).join("");
+            }
+
+            // Render Custom Request Pipeline Box
+            const requestsWrapper = document.getElementById("admin-requests-queue-wrapper");
+            if(requests.length === 0) {
+                requestsWrapper.innerHTML = `<p style="font-size:0.85rem; color:#94A3B8;">Belum ada pengajuan custom request barang.</p>`;
+            } else {
+                requestsWrapper.innerHTML = [...requests].reverse().map(r => `
+                    <div class="admin-order-card" style="border-left:4px solid var(--info);">
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:700;">
+                            <span>${r.requestId} [${r.name}]</span>
+                            <span style="color:var(--info); font-size:0.75rem;">${r.priority}</span>
+                        </div>
+                        <p style="font-size:0.75rem; color:#94A3B8; margin-top:4px;"><b>Desc:</b> ${r.desc} | Est Harga: Rp ${r.price.toLocaleString('id-ID')}</p>
+                        <p style="font-size:0.75rem; color:#94A3B8;"><b>User Pemohon:</b> ${r.customerName} (${r.customerPhone})</p>
+                        
+                        <div style="display:flex; gap:6px; margin-top:10px;">
+                            <button class="btn-premium" style="font-size:0.7rem; padding:6px; background:var(--success);" onclick="mutateCustomRequestAction('${r.requestId}', 'Terima')">✔ Terima Request</button>
+                            <button class="btn-premium" style="font-size:0.7rem; padding:6px; background:var(--primary);" onclick="mutateCustomRequestAction('${r.requestId}', 'Tolak')">❌ Tolak Request</button>
+                        </div>
+                    </div>
+                `).join("");
+            }
+        }
+
+        function executeAdminStatusMutation(orderId, nextStatus) {
+            if(!nextStatus) return;
+            let orders = JSON.parse(localStorage.getItem("cj_master_orders_list") || "[]");
+            const idx = orders.findIndex(o => o.orderId === orderId);
+            if(idx === -1) return;
+
+            orders[idx].status = nextStatus;
+            
+            // Auto Update Logs Dynamic Note Mapping Rules
+            if(nextStatus === "Diproses") orders[idx].adminNote = "Pembayaran sah. Barang sedang disiapkan.";
+            if(nextStatus === "Dibeli") orders[idx].adminNote = "Kurir telah membelikan barang Anda di toko.";
+            if(nextStatus === "Diantar") orders[idx].adminNote = "Kurir berkendara menuju titik tower hunian Anda.";
+            if(nextStatus === "Hampir Sampai") orders[idx].adminNote = "Kurir berada di koridor lift kamar Anda.";
+            if(nextStatus === "Selesai") orders[idx].adminNote = "Paket diserahkan secara aman. Selesai.";
+
+            localStorage.setItem("cj_master_orders_list", JSON.stringify(orders));
+            renderAdminBackofficeViewEngine();
+            
+            dispatchAudioNotificationSound();
+            injectRealtimeSystemNotification("Update Jastip", `Status order ${orderId} diperbarui kurir menjadi: ${nextStatus}`);
+        }
+
+        function triggerAdminCustomMessage(orderId) {
+            Swal.fire({
+                title: "Kirim Catatan Kurir",
+                input: "text",
+                inputPlaceholder: "Contoh: Sate Taichan kosong, diganti sate ayam biasa ya?",
+                showCancelButton: true,
+                confirmButtonText: "Injeksi Update"
+            }).then((res) => {
+                if(res.isConfirmed && res.value) {
+                    let orders = JSON.parse(localStorage.getItem("cj_master_orders_list") || "[]");
+                    const idx = orders.findIndex(o => o.orderId === orderId);
+                    if(idx !== -1) {
+                        orders[idx].adminNote = res.value;
+                        localStorage.setItem("cj_master_orders_list", JSON.stringify(orders));
+                        renderAdminBackofficeViewEngine();
+                        injectRealtimeSystemNotification("Pesan Kurir", `Catatan baru untuk ${orderId}: "${res.value}"`);
+                    }
+                }
+            });
+        }
+
+        function mutateCustomRequestAction(requestId, action) {
+            let requests = JSON.parse(localStorage.getItem("cj_requests") || "[]");
+            const idx = requests.findIndex(r => r.requestId === requestId);
+            if(idx === -1) return;
+
+            if(action === "Terima") {
+                requests[idx].status = "Diterima Admin";
+                Swal.fire("Request Disetujui", "Notifikasi diteruskan ke pemesan.", "success");
+            } else {
+                requests[idx].status = "Ditolak";
+                Swal.fire("Request Ditolak", "Item dihapus dari antrean validasi.", "error");
+            }
+
+            localStorage.setItem("cj_requests", JSON.stringify(requests));
+            renderAdminBackofficeViewEngine();
+        }
+
+        function exportAdminMetricsToExcelSheet() {
+            const data = JSON.parse(localStorage.getItem("cj_master_orders_list") || "[]");
+            const rows = data.map(o => ({
+                ID_Order: o.orderId, Nama: o.customerName, No_WA: o.customerPhone, Alamat: `${o.tower} Kamar ${o.room}`, Belanja: o.subtotal, Komisi: o.jastipFee, Status: o.status, Tanggal: o.timestamp
+            }));
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap Finansial 2026");
+            XLSX.writeFile(wb, "Laporan_Global_Campus_Jastip.xlsx");
+        }
+
+        /* ==========================================================================
+           13. UX AUTOMATION NOTIFICATIONS & AUDIO LOGIC
+           ========================================================================== */
+        function dispatchAudioNotificationSound() {
+            const sound = document.getElementById("snd-kling");
+            if(sound) { sound.currentTime = 0; sound.play().catch(() => {}); }
+        }
+
+        function injectRealtimeSystemNotification(title, text) {
+            let list = JSON.parse(localStorage.getItem("cj_system_notifications") || "[]");
+            list.unshift({ title, text, time: new Date().toLocaleTimeString('id-ID') });
+            localStorage.setItem("cj_system_notifications", JSON.stringify(list));
+            
+            Swal.fire({ toast: true, position: 'top', icon: 'info', title: title, text: text, showConfirmButton: false, timer: 3500 });
+            dispatchAudioNotificationSound();
+        }
+
+        function toggleFloatingAIAssistant() {
+            document.getElementById("ai-chat-window").classList.toggle("hidden");
+        }
+
+        function executeAIBotMacroFaq(topic) {
+            const msgBox = document.getElementById("ai-msg-box");
+            let ans = "";
+
+            if(topic === 'Cara Pesan') ans = "Pilih item jastip di halaman Home, klik '+ Tambah', beralih ke menu Keranjang, tentukan lokasi hunian kost/dormitory, lakukan scan QRIS merchant, upload bukti transfer resmi, dan kirim dokumen PDF faktur ke WhatsApp kurir.";
+            if(topic === 'Tarif Jastip') ans = "Biaya distribusi flat resmi: Student Housing (SBH/NBH) Rp3.000, Living & Monroe Apartment Rp5.000, Cluster Perumahan Graha Asri Rp6.000.";
+            if(topic === 'Metode Pembayaran') ans = "Pembayaran terpusat menggunakan scan sistem QRIS merchant universal yang mendukung GoPay, OVO, Dana, ShopeePay, LinkAja, maupun m-banking BCA/Mandiri/BNI.";
+
+            msgBox.innerHTML += `
+                <div style="background:var(--primary); color:white; padding:10px; border-radius:12px; align-self:flex-end; max-width:85%; font-weight:500;">${topic}</div>
+                <div style="background:white; padding:10px; border-radius:12px; align-self:flex-start; max-width:85%; border:1px solid #E2E8F0;">${ans}</div>
+            `;
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
+
+        /* ==========================================================================
+           14. GLOBAL APPLICATION ROUTER VIEW MANAGEMENT
+           ========================================================================== */
+        function switchView(targetName) {
+            document.querySelectorAll(".view-section").forEach(s => s.classList.add("hidden"));
+            document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+
+            const targetSection = document.getElementById(`view-${targetName}`);
+            const targetNavLink = document.getElementById(`nav-${targetName}`);
+
+            if(targetSection) targetSection.classList.remove("hidden");
+            if(targetNavLink) targetNavLink.classList.add("active");
+
+            // Context Lazy Loader Components Hook
+            if(targetName === "home") {
+                renderHomeActiveTrackerComponent();
+                renderCatalogItemsComponent();
+            }
+            if(targetName === "cart") renderCartViewContents();
+            if(targetName === "tracking") renderTrackingViewDashboard();
+            if(targetName === "notifications") {
+                const wrapper = document.getElementById("notif-list-wrapper");
+                const list = JSON.parse(localStorage.getItem("cj_system_notifications") || "[]");
+                
+                document.getElementById("notif-badge").innerText = "0";
+                if(list.length === 0) {
+                    wrapper.innerHTML = `<p style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.85rem;">Belum ada pemberitahuan log untuk Anda.</p>`;
+                } else {
+                    wrapper.innerHTML = list.map(n => `
+                        <div style="background:white; padding:14px; border-radius:var(--border-radius); border:1px solid #E2E8F0; margin-bottom:8px; box-shadow:var(--shadow-sm);">
+                            <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.85rem;"><span>${n.title}</span><span style="font-size:0.7rem; color:var(--text-muted);">${n.time}</span></div>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">${n.text}</p>
+                        </div>
+                    `).join("");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
